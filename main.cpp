@@ -43,11 +43,18 @@ static int gettok() {
   //next we check if it is numVal
   while(isdigit(LastChar) || LastChar == '.'){
     std::string NumStr;
-    //Since you can't have multiple decimal points in the 
+    //Since you can't have multiple decimal points in the we will have a flag to check if it has been added already
+    bool DecimalPoint = false;
+    if(LastChar == '.'){
+      DecimalPoint = true;
+    }
     do{
       NumStr += LastChar;
       LastChar = getchar();
-    } while(isdigit(LastChar) || LastChar == '.');
+      if(LastChar == '.'){
+        DecimalPoint = true;
+      }
+    } while(isdigit(LastChar) || (LastChar == '.' && DecimalPoint == false));
     //we then convert the NumStr to a double
     NumVal = strtod(NumStr.c_str(),0);
     return tok_number;
