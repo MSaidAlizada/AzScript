@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+using namespace std;
 
 //LEXER
 enum Token {
@@ -77,5 +78,63 @@ static int gettok() {
 }
 
 int main() {
+  while (true){
+    int tok = gettok();
+    cout << "got token " << tok << endl;
+  }
   return 0;
+};
+
+//ABSTRACT SYNTAX TREE
+//The types of nodes in the AST is split into 3 sections Expressions, Prototypes and Functions
+
+//Expressions
+//For all expressions they will be derived from a base class called ExprAST
+class ExprAST{
+  public: virtual ~ExprAST() = default;
+};
+//The expressions we will have nodes for numeric literals, referencing variables, binary operators and function calls
+class NumberExprAST : public ExprAST{
+  double Val;
+
+  public:
+    NumberExprAST(double Val) : Val(Val) {}
+};
+
+class VariableExprAST : public ExprAST{
+  string Name;
+  public:
+    VariableExprAST(const string &Name) : Name(Name) {}
+};
+
+class BinaryExprAST : public ExprAST{
+  char Op;
+  unique_ptr<ExprAST> LHS, RHS;
+  public:
+    BinaryExprAST(char Op, unique_ptr<ExprAST> LHS, unique_ptr<ExprAST>  RHS) : Op(Op), LHS(move(LHS)), RHS(move(RHS)){}
+};
+
+class CallExprAST : public ExprAST{
+  string Callee;
+  vector<unique_ptr<ExprAST>> Args;
+  public:
+    CallExprAST(string Callee, vector<unique_ptr<ExprAST>> Args) : Callee(Callee), Args(move(Args)) {}
+};
+
+//Prototype
+//Used to get the name of function and its arguements
+class PrototypeAST{
+  string Name;
+  vector<string> Args;
+  public:
+    PrototypeAST(const string &Name, vector<string> Args) : Name(Name), Args(move(Args)) {}
+};
+
+//Function
+//Represents functions deifintion itself which is a combination of Prototype and Body
+class FunctionAST{
+  unique_ptr<PrototypeAST> Proto;
+  unique_ptr<ExprAST> Body;
+  public:
+    FunctionAST(unique_ptr<PrototypeAST> Proto, unique_ptr<ExprAST> Body) : Proto(move(Proto)), Body(move(Body)) {}
 };
